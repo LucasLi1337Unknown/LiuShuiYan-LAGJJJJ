@@ -98,14 +98,19 @@ function planTable(people=state.people){
   $("#plannerPreview>p").textContent=`已为 ${state.people} 位客人配好 ${selection.slice(0,wanted).length} 道菜，总计 ¥${selection.slice(0,wanted).reduce((s,d)=>s+d.price,0)}。菜单已经放进菜篮。`;toast("一桌好菜已经配好啦")
 }
 
-const BASE_REVIEWS=[
-  {name:"语文课食客 · 林同学",rating:5,text:"最喜欢它不只是好看，点菜、配桌和预订真的都能操作，一下就有开宴的感觉。"},
-  {name:"试吃官 · 小周",rating:5,text:"可乐鸡翅和酸梅汤是我的固定组合。页面像水一样流动，但中国红又很热闹。"},
-  {name:"宴席策划人 · 阿禾",rating:4,text:"一键配桌很适合选择困难的人，搭出来有荤有素、有汤有甜，很完整。"}
-];
-function allReviews(){const own=state.cloudReviewsLoaded?state.cloudReviews:readJSON(STORE.reviews,[]);return [...own,...BASE_REVIEWS]}
-function renderReviews(){const reviews=allReviews();state.reviewIndex=Math.min(state.reviewIndex,reviews.length-1);$("#reviewTrack").innerHTML=reviews.map((r,i)=>`<article class="review-card ${i===state.reviewIndex?"active":""}"><div class="quote">“${esc(r.text)}”</div><div class="stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div><small>${esc(r.name)}</small></article>`).join("");$("#reviewDots").innerHTML=reviews.map((_,i)=>`<button class="${i===state.reviewIndex?"active":""}" data-review="${i}" aria-label="第${i+1}条评价"></button>`).join("")}
-function moveReview(delta){const n=allReviews().length;state.reviewIndex=(state.reviewIndex+delta+n)%n;renderReviews()}
+function allReviews(){return state.cloudReviewsLoaded?state.cloudReviews:[]}
+function renderReviews(){
+  const reviews=allReviews(),prev=$("#reviewPrev"),next=$("#reviewNext");
+  if(!reviews.length){
+    state.reviewIndex=0;
+    $("#reviewTrack").innerHTML='<article class="review-card review-empty active"><div class="quote">还没有真人评价</div><div class="stars">☆☆☆☆☆</div><small>成为第一位留下感受的食客吧</small></article>';
+    $("#reviewDots").innerHTML="";prev.disabled=true;next.disabled=true;return;
+  }
+  prev.disabled=false;next.disabled=false;state.reviewIndex=Math.min(state.reviewIndex,reviews.length-1);
+  $("#reviewTrack").innerHTML=reviews.map((r,i)=>`<article class="review-card ${i===state.reviewIndex?"active":""}"><div class="quote">“${esc(r.text)}”</div><div class="stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div><small>${esc(r.name)}</small></article>`).join("");
+  $("#reviewDots").innerHTML=reviews.map((_,i)=>`<button class="${i===state.reviewIndex?"active":""}" data-review="${i}" aria-label="第${i+1}条评价"></button>`).join("")
+}
+function moveReview(delta){const n=allReviews().length;if(!n)return;state.reviewIndex=(state.reviewIndex+delta+n)%n;renderReviews()}
 
 function setupUI(){
   document.addEventListener("click",e=>{
@@ -147,13 +152,13 @@ function playStory(){if(!("speechSynthesis" in window)){toast("这个浏览器�
 function getDeviceId(){let id=localStorage.getItem(STORE.device);if(!id){id=crypto.randomUUID?crypto.randomUUID():`lsy-${Date.now()}-${Math.random().toString(16).slice(2)}`;localStorage.setItem(STORE.device,id)}return id}
 function cloudConfig(){const c=window.LSY_CONFIG||{};return c.SUPABASE_URL&&c.SUPABASE_ANON_KEY?c:null}
 function cloudHeaders(c,extra={}){const headers={apikey:c.SUPABASE_ANON_KEY,...extra};if(!c.SUPABASE_ANON_KEY.startsWith("sb_publishable_"))headers.Authorization=`Bearer ${c.SUPABASE_ANON_KEY}`;return headers}
-async function cloudCount(){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reservations?select=id`,{headers:cloudHeaders(c,{Prefer:"count=exact"})});if(!res.ok)throw new Error("count failed");const range=res.headers.get("content-range");return range?Number(range.split("/")[1]):(await res.json()).length}
+async function cloudCount(){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reservations?select=party_size`,{headers:cloudHeaders(c)});if(!res.ok)throw new Error("count failed");const rows=await res.json();return rows.reduce((total,row)=>total+Number(row.party_size||0),0)}
 async function cloudReserve(data){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reservations`,{method:"POST",headers:cloudHeaders(c,{"Content-Type":"application/json",Prefer:"return=minimal"}),body:JSON.stringify(data)});if(!res.ok){const body=await res.text();if(res.status===409||body.includes("duplicate"))throw new Error("duplicate");throw new Error("save failed")}return true}
 async function cloudSubscribe(email){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/newsletter_subscribers`,{method:"POST",headers:cloudHeaders(c,{"Content-Type":"application/json",Prefer:"return=minimal"}),body:JSON.stringify({email})});if(!res.ok){const body=await res.text();if(res.status===409||body.includes("duplicate"))return "duplicate";throw new Error("subscribe failed")}return "saved"}
 async function cloudLoadReviews(){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reviews?select=name,rating,text,created_at&order=created_at.desc&limit=100`,{headers:cloudHeaders(c)});if(!res.ok)throw new Error("reviews load failed");return await res.json()}
 async function cloudSaveReview(review){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reviews`,{method:"POST",headers:cloudHeaders(c,{"Content-Type":"application/json",Prefer:"return=representation"}),body:JSON.stringify(review)});if(!res.ok)throw new Error("review save failed");const rows=await res.json();return rows[0]||review}
-async function setupReviews(){try{const reviews=await cloudLoadReviews();if(reviews!==null){state.cloudReviews=reviews;state.cloudReviewsLoaded=true;state.reviewIndex=0;renderReviews()}}catch(err){console.warn(err);toast("云端评价读取失败，正在显示本机内容")}}
-async function handleReview(e){e.preventDefault();const form=e.currentTarget;const button=form.querySelector("button[type='submit'],button:not([type])");const fd=new FormData(form);const review={name:String(fd.get("name")).trim(),rating:Number(fd.get("rating")),text:String(fd.get("text")).trim()};button.disabled=true;button.textContent="正在发布…";try{if(cloudConfig()){const saved=await cloudSaveReview(review);state.cloudReviews.unshift(saved);state.cloudReviewsLoaded=true}else{const own=readJSON(STORE.reviews,[]);own.unshift(review);writeJSON(STORE.reviews,own)}state.reviewIndex=0;renderReviews();$("#reviewModal").close();form.reset();toast(cloudConfig()?"评价已同步，所有人都能看到":"评价已保存在当前浏览器")}catch(err){toast("评价发布失败，请稍后再试")}finally{button.disabled=false;button.textContent="发布评价"}}
+async function setupReviews(){if(!cloudConfig()){state.cloudReviews=[];state.cloudReviewsLoaded=true;renderReviews();return}try{const reviews=await cloudLoadReviews();state.cloudReviews=reviews||[];state.cloudReviewsLoaded=true;state.reviewIndex=0;renderReviews()}catch(err){console.warn(err);state.cloudReviews=[];state.cloudReviewsLoaded=true;renderReviews();toast("云端评价读取失败，请检查 Supabase 连接")}}
+async function handleReview(e){e.preventDefault();const form=e.currentTarget;const button=form.querySelector("button[type='submit'],button:not([type])");const fd=new FormData(form);const review={name:String(fd.get("name")).trim(),rating:Number(fd.get("rating")),text:String(fd.get("text")).trim()};button.disabled=true;button.textContent="正在发布…";try{if(!cloudConfig())throw new Error("cloud");const saved=await cloudSaveReview(review);state.cloudReviews.unshift(saved);state.cloudReviewsLoaded=true;state.reviewIndex=0;renderReviews();$("#reviewModal").close();form.reset();toast("评价已同步，所有人都能看到")}catch(err){toast("评价发布失败，请检查 Supabase 连接")}finally{button.disabled=false;button.textContent="发布评价"}}
 async function handleNewsletter(e){
   e.preventDefault();const form=e.currentTarget;const input=form.elements.email;const button=form.querySelector("button[type='submit']");const email=input.value.trim().toLowerCase();if(!email)return;
   button.disabled=true;button.textContent="正在订阅…";
@@ -163,15 +168,16 @@ async function handleNewsletter(e){
   }catch(err){toast("暂时无法保存，请稍后再试")}finally{button.disabled=false;button.textContent="订阅流水信"}
 }
 async function setupReservation(){
-  const local=readJSON(STORE.reserved,null);try{const count=await cloudCount();if(count!==null){updateCount(count,"云端实时","所有设备共享的真实人数");return}}catch(e){console.warn(e)}
-  updateCount(local?1:0,"本机模式","连接免费云端后可全班同步");
+  if(!cloudConfig()){updateCount("—","尚未连接云端","请确认 config.js 已上传到当前仓库根目录");return}
+  try{const count=await cloudCount();updateCount(count,"云端实时","所有设备共享的真实人数")}
+  catch(e){console.warn(e);updateCount("—","云端连接失败","请确认已运行最新版 Supabase SQL")}
 }
 function updateCount(count,status,note){$("#reserveCount").textContent=count;$("#heroReserveCount").textContent=count;$("#syncStatus").textContent=status;$("#countNote").textContent=note}
 function openReserve(){const existing=readJSON(STORE.reserved,null);const form=$("#reserveForm"),success=$("#reserveSuccess");if(existing){form.hidden=true;success.hidden=false;$("#successText").textContent=`${existing.nickname||"同学"}，你已预订 ${existing.partySize||""} 位，开宴见！`}else{form.hidden=false;success.hidden=true}$("#reserveModal").showModal()}
 $("#reserveForm")?.addEventListener("submit",async e=>{
   e.preventDefault();const button=e.target.querySelector("button[type=submit]");button.disabled=true;button.textContent="正在留席…";const fd=new FormData(e.target);const data={device_id:getDeviceId(),nickname:String(fd.get("nickname")).trim(),party_size:Number(fd.get("partySize")),visit_date:fd.get("visitDate"),visit_time:fd.get("visitTime"),seating:fd.get("seating")};
-  try{if(cloudConfig())await cloudReserve(data);writeJSON(STORE.reserved,{nickname:data.nickname,partySize:data.party_size,date:data.visit_date});e.target.hidden=true;$("#reserveSuccess").hidden=false;$("#successText").textContent=`${data.nickname}，已为 ${data.party_size} 位客人留席，${data.visit_date} 开宴见！`;const count=cloudConfig()?await cloudCount():1;updateCount(count,cloudConfig()?"云端实时":"本机模式",cloudConfig()?"所有设备共享的真实人数":"此浏览器已完成预订");$("#mainReserveButton").textContent="已预订 ✓";toast("预订成功，已为你留席")}
-  catch(err){toast(err.message==="duplicate"?"这台设备已经预订过了":"暂时无法连接云端，请稍后再试")}
+  try{if(!cloudConfig())throw new Error("cloud");await cloudReserve(data);writeJSON(STORE.reserved,{nickname:data.nickname,partySize:data.party_size,date:data.visit_date});e.target.hidden=true;$("#reserveSuccess").hidden=false;$("#successText").textContent=`${data.nickname}，已为 ${data.party_size} 位客人留席，${data.visit_date} 开宴见！`;const count=await cloudCount();updateCount(count,"云端实时","所有设备共享的真实人数");$("#mainReserveButton").textContent="已预订 ✓";toast("预订成功，已同步到云端")}
+  catch(err){toast(err.message==="duplicate"?"这台设备已经预订过了":"云端预订失败，请检查 Supabase 连接")}
   finally{button.disabled=false;button.textContent="确认预订"}
 });
 

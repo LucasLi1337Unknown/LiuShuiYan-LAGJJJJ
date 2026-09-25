@@ -50,3 +50,4 @@ body.night{--ink:#e9f4f3;--deep:#031f2b;--paper:#092d38;--paper-2:#06232d;--mute
 .ink-one{background-image:linear-gradient(180deg,rgba(2,36,45,.05),rgba(2,36,45,.85)),url("assets/images/fresh-table.png");background-size:cover;background-position:center}
 .ink-two{background-image:linear-gradient(180deg,rgba(65,16,23,.08),rgba(65,16,23,.88)),url("assets/images/signature-feast.png");background-size:cover;background-position:center}
 .ink-three{background-image:linear-gradient(180deg,rgba(3,45,48,.06),rgba(3,45,48,.88)),url("assets/images/soups-sweets.png");background-size:cover;background-position:center}
+.empty-state[hidden]{display:none!important}
