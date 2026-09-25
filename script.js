@@ -48,7 +48,7 @@ const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const state = {
   category:"全部", search:"", favoritesOnly:false,
   cart:readJSON(STORE.cart,{}), favorites:new Set(readJSON(STORE.favorites,[])),
-  people:6, reviewIndex:0
+  people:6, reviewIndex:0, cloudReviews:[], cloudReviewsLoaded:false
 };
 
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
@@ -59,7 +59,7 @@ function artMarkup(d,small=false){return `<div class="dish-art${small?" cart-thu
 function toast(message){const el=document.createElement("div");el.className="toast";el.textContent=message;$("#toastStack").append(el);setTimeout(()=>el.classList.add("hide"),2600);setTimeout(()=>el.remove(),3000)}
 
 function init(){
-  applySavedTheme(); renderTabs(); renderDishes(); renderCart(); renderReviews(); setupUI(); setupReveal(); setupReservation(); renderHeroArt();
+  applySavedTheme(); renderTabs(); renderDishes(); renderCart(); renderReviews(); setupUI(); setupReveal(); setupReservation(); setupReviews(); renderHeroArt();
   const date=$("input[name='visitDate']"); if(date){const today=new Date();date.min=today.toISOString().slice(0,10);const next=new Date(today);next.setDate(today.getDate()+1);date.value=next.toISOString().slice(0,10)}
 }
 
@@ -103,7 +103,7 @@ const BASE_REVIEWS=[
   {name:"试吃官 · 小周",rating:5,text:"可乐鸡翅和酸梅汤是我的固定组合。页面像水一样流动，但中国红又很热闹。"},
   {name:"宴席策划人 · 阿禾",rating:4,text:"一键配桌很适合选择困难的人，搭出来有荤有素、有汤有甜，很完整。"}
 ];
-function allReviews(){return [...readJSON(STORE.reviews,[]),...BASE_REVIEWS]}
+function allReviews(){const own=state.cloudReviewsLoaded?state.cloudReviews:readJSON(STORE.reviews,[]);return [...own,...BASE_REVIEWS]}
 function renderReviews(){const reviews=allReviews();state.reviewIndex=Math.min(state.reviewIndex,reviews.length-1);$("#reviewTrack").innerHTML=reviews.map((r,i)=>`<article class="review-card ${i===state.reviewIndex?"active":""}"><div class="quote">“${esc(r.text)}”</div><div class="stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div><small>${esc(r.name)}</small></article>`).join("");$("#reviewDots").innerHTML=reviews.map((_,i)=>`<button class="${i===state.reviewIndex?"active":""}" data-review="${i}" aria-label="第${i+1}条评价"></button>`).join("")}
 function moveReview(delta){const n=allReviews().length;state.reviewIndex=(state.reviewIndex+delta+n)%n;renderReviews()}
 
@@ -129,7 +129,7 @@ function setupUI(){
   $("#peopleMinus").onclick=()=>{state.people=Math.max(2,state.people-1);$("#peopleCount").textContent=state.people};
   $("#peoplePlus").onclick=()=>{state.people=Math.min(16,state.people+1);$("#peopleCount").textContent=state.people};$("#autoPlan").onclick=()=>planTable();
   $("#reviewPrev").onclick=()=>moveReview(-1);$("#reviewNext").onclick=()=>moveReview(1);$("#openReview").onclick=()=>$("#reviewModal").showModal();
-  $("#reviewForm").onsubmit=e=>{e.preventDefault();const fd=new FormData(e.target);const own=readJSON(STORE.reviews,[]);own.unshift({name:fd.get("name"),rating:Number(fd.get("rating")),text:fd.get("text")});writeJSON(STORE.reviews,own);state.reviewIndex=0;renderReviews();$("#reviewModal").close();e.target.reset();toast("谢谢，你的评价已经出现啦")};
+  $("#reviewForm").onsubmit=handleReview;
   $("#newsletterForm").onsubmit=handleNewsletter;
   $$('[data-open-reserve]').forEach(b=>b.onclick=()=>openReserve());
   $("#themeToggle").onclick=toggleTheme;$("#menuToggle").onclick=()=>$("#mobileNav").classList.toggle("open");$$('#mobileNav a').forEach(a=>a.onclick=()=>$("#mobileNav").classList.remove("open"));
@@ -150,6 +150,10 @@ function cloudHeaders(c,extra={}){const headers={apikey:c.SUPABASE_ANON_KEY,...e
 async function cloudCount(){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reservations?select=id`,{headers:cloudHeaders(c,{Prefer:"count=exact"})});if(!res.ok)throw new Error("count failed");const range=res.headers.get("content-range");return range?Number(range.split("/")[1]):(await res.json()).length}
 async function cloudReserve(data){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reservations`,{method:"POST",headers:cloudHeaders(c,{"Content-Type":"application/json",Prefer:"return=minimal"}),body:JSON.stringify(data)});if(!res.ok){const body=await res.text();if(res.status===409||body.includes("duplicate"))throw new Error("duplicate");throw new Error("save failed")}return true}
 async function cloudSubscribe(email){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/newsletter_subscribers`,{method:"POST",headers:cloudHeaders(c,{"Content-Type":"application/json",Prefer:"return=minimal"}),body:JSON.stringify({email})});if(!res.ok){const body=await res.text();if(res.status===409||body.includes("duplicate"))return "duplicate";throw new Error("subscribe failed")}return "saved"}
+async function cloudLoadReviews(){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reviews?select=name,rating,text,created_at&order=created_at.desc&limit=100`,{headers:cloudHeaders(c)});if(!res.ok)throw new Error("reviews load failed");return await res.json()}
+async function cloudSaveReview(review){const c=cloudConfig();if(!c)return null;const res=await fetch(`${c.SUPABASE_URL}/rest/v1/reviews`,{method:"POST",headers:cloudHeaders(c,{"Content-Type":"application/json",Prefer:"return=representation"}),body:JSON.stringify(review)});if(!res.ok)throw new Error("review save failed");const rows=await res.json();return rows[0]||review}
+async function setupReviews(){try{const reviews=await cloudLoadReviews();if(reviews!==null){state.cloudReviews=reviews;state.cloudReviewsLoaded=true;state.reviewIndex=0;renderReviews()}}catch(err){console.warn(err);toast("云端评价读取失败，正在显示本机内容")}}
+async function handleReview(e){e.preventDefault();const form=e.currentTarget;const button=form.querySelector("button[type='submit'],button:not([type])");const fd=new FormData(form);const review={name:String(fd.get("name")).trim(),rating:Number(fd.get("rating")),text:String(fd.get("text")).trim()};button.disabled=true;button.textContent="正在发布…";try{if(cloudConfig()){const saved=await cloudSaveReview(review);state.cloudReviews.unshift(saved);state.cloudReviewsLoaded=true}else{const own=readJSON(STORE.reviews,[]);own.unshift(review);writeJSON(STORE.reviews,own)}state.reviewIndex=0;renderReviews();$("#reviewModal").close();form.reset();toast(cloudConfig()?"评价已同步，所有人都能看到":"评价已保存在当前浏览器")}catch(err){toast("评价发布失败，请稍后再试")}finally{button.disabled=false;button.textContent="发布评价"}}
 async function handleNewsletter(e){
   e.preventDefault();const form=e.currentTarget;const input=form.elements.email;const button=form.querySelector("button[type='submit']");const email=input.value.trim().toLowerCase();if(!email)return;
   button.disabled=true;button.textContent="正在订阅…";
