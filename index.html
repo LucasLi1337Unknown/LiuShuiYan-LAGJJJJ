@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#082f49">
+  <meta name="description" content="流水宴——流水有意，佳肴成席。中式主题宴席、菜单搭配与在线预订。">
+  <title>流水宴｜流水有意，佳肴成席</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#menu">跳到菜单</a>
+  <div class="page-progress" id="pageProgress"></div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="流水宴首页">
+      <span class="brand-seal">流</span>
+      <span><b>流水宴</b><small>LIU SHUI YAN</small></span>
+    </a>
+    <nav class="desktop-nav" aria-label="主要导航">
+      <a href="#story">品牌</a><a href="#menu">菜单</a><a href="#planner">配桌</a>
+      <a href="#events">宴席</a><a href="#reviews">食客说</a><a href="#reserve">预订</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-button" id="themeToggle" aria-label="切换夜宴模式" title="夜宴模式">☾</button>
+      <button class="cart-button" id="openCart"><span>菜篮</span><b id="cartCount">0</b></button>
+      <button class="icon-button mobile-only" id="menuToggle" aria-label="打开菜单">☰</button>
+    </div>
+  </header>
+  <nav class="mobile-nav" id="mobileNav" aria-label="手机导航">
+    <a href="#story">品牌故事</a><a href="#menu">流水菜单</a><a href="#planner">一键配桌</a>
+    <a href="#events">主题宴席</a><a href="#reviews">食客说</a><a href="#reserve">我要预订</a>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="water-orb orb-a"></div><div class="water-orb orb-b"></div>
+      <div class="hero-copy reveal">
+        <p class="eyebrow"><span></span> 流水宴 · 主题宴席品牌</p>
+        <h1>流水有意，<br><em>佳肴成席</em></h1>
+        <p class="hero-lead">让一道道熟悉的中国味，沿着流水来到同一张桌。选菜、配席、预订，一场宴从这里开始。</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#menu">查看菜单 <span>→</span></a>
+          <button class="btn btn-ghost" data-open-reserve>我要预订</button>
+        </div>
+        <div class="hero-meta">
+          <div><b>30</b><span>道精心菜单</span></div><div><b>6</b><span>种席面风味</span></div>
+          <div><b id="heroReserveCount">—</b><span>人已留席</span></div>
+        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="hero-plate">
+          <div class="dish-art hero-art" data-art="peking-duck"></div>
+          <span class="steam steam-1"></span><span class="steam steam-2"></span>
+        </div>
+        <div class="floating-card card-one"><small>今日招牌</small><b>北京烤鸭</b><span>外酥里嫩 · 果木香</span></div>
+        <div class="floating-card card-two"><b>今席可订</b><span class="live-dot"></span><small>每桌皆有专属搭配</small></div>
+        <div class="hero-chopsticks"></div>
+      </div>
+      <div class="hero-scroll"><span>SCROLL</span><i></i></div>
+    </section>
+
+    <section class="marquee" aria-label="品牌特色"><div>
+      <span>鲜材当季</span><i>◆</i><span>一席一味</span><i>◆</i><span>手作温度</span><i>◆</i>
+      <span>流水有意</span><i>◆</i><span>佳肴成席</span><i>◆</i><span>鲜材当季</span><i>◆</i>
+      <span>一席一味</span><i>◆</i><span>手作温度</span><i>◆</i>
+    </div></section>
+
+    <section class="story section-shell" id="story">
+      <div class="section-label">01 / 品牌故事</div>
+      <div class="story-grid">
+        <div class="story-copy reveal">
+          <p class="eyebrow dark"><span></span> THE STORY OF WATER</p>
+          <h2>水把远方带来，<br>宴让彼此坐近。</h2>
+          <p>“流水宴”取流水不息、宾朋相聚之意。我们把经典菜式重新编排，用清雅的水纹与热烈的中国红，做一张既有传统温度、也有当代趣味的席。</p>
+          <p>这里不仅能看菜单。你可以收藏喜欢的菜、邀请系统替你配一桌、调整人数和预算，再为自己留下一席。</p>
+          <button class="text-link" id="playStory">听一段流水宴的故事 <span>▶</span></button>
+        </div>
+        <div class="story-panel reveal">
+          <div class="story-ripple"></div>
+          <div class="vertical-words">一席流水意<br>满桌人间味</div>
+          <div class="story-seal">宴</div>
+          <div class="story-stats"><span><b>四时</b>取味</span><span><b>八方</b>来客</span><span><b>一席</b>相聚</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="menu-section" id="menu">
+      <div class="section-shell">
+        <div class="section-head reveal">
+          <div><div class="section-label">02 / 流水菜单</div><h2>好菜不必赶，<br><em>沿席慢慢挑。</em></h2></div>
+          <p>六类风味、三十道菜。点击菜品看详情，加入菜篮后可自由增减数量。</p>
+        </div>
+        <div class="menu-toolbar reveal">
+          <div class="category-tabs" id="categoryTabs" role="tablist"></div>
+          <label class="search-box"><span>⌕</span><input id="dishSearch" type="search" placeholder="搜索菜名或口味…" aria-label="搜索菜品"></label>
+        </div>
+        <div class="menu-results"><span id="resultCount">30 道菜</span><button id="favoritesOnly">♡ 只看收藏</button></div>
+        <div class="dish-grid" id="dishGrid"></div>
+        <div class="empty-state" id="emptyState" hidden><b>这一席暂时空着</b><span>换个关键词或分类试试。</span></div>
+      </div>
+    </section>
+
+    <section class="planner section-shell" id="planner">
+      <div class="planner-card reveal">
+        <div class="planner-copy">
+          <div class="section-label light">03 / 宴席管家</div>
+          <h2>告诉我们几个人，<br>替你配一桌。</h2>
+          <p>从荤素、汤品、凉菜到甜饮，自动安排一桌有层次的流水宴。生成后仍可自己修改。</p>
+          <div class="people-control">
+            <button id="peopleMinus" aria-label="减少人数">−</button><strong><span id="peopleCount">6</span><small>位</small></strong><button id="peoplePlus" aria-label="增加人数">＋</button>
+          </div>
+          <button class="btn btn-gold" id="autoPlan">一键配一桌 <span>✦</span></button>
+        </div>
+        <div class="planner-preview" id="plannerPreview">
+          <div class="round-table"><div class="table-center"><span>流</span><small>等你开席</small></div></div>
+          <p>点击“一键配一桌”，看看宴席管家为你选什么。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="events section-shell" id="events">
+      <div class="section-head reveal"><div><div class="section-label">04 / 主题宴席</div><h2>每一种相聚，<br><em>都有它的席面。</em></h2></div><p>课堂小组活动、朋友聚会或节日家宴，都能找到恰好的组合。</p></div>
+      <div class="event-grid">
+        <article class="event-card event-large reveal"><div class="event-ink ink-one"></div><span>01</span><div><small>CLASS GATHERING</small><h3>同窗流水席</h3><p>清爽、热闹、人人都能找到喜欢的一口。</p><button class="event-plan" data-people="8">生成 8 人菜单 →</button></div></article>
+        <article class="event-card reveal"><div class="event-ink ink-two"></div><span>02</span><div><small>FAMILY DINNER</small><h3>团圆家宴</h3><p>汤暖、菜丰、甜品收尾。</p><button class="event-plan" data-people="6">生成 6 人菜单 →</button></div></article>
+        <article class="event-card reveal"><div class="event-ink ink-three"></div><span>03</span><div><small>TEA & TASTE</small><h3>午后雅集</h3><p>凉菜、甜品与清茶的小席。</p><button class="event-plan" data-people="4">生成 4 人菜单 →</button></div></article>
+      </div>
+    </section>
+
+    <section class="reservation-band" id="reserve">
+      <div class="band-pattern"></div>
+      <div class="reservation-inner section-shell">
+        <div class="popularity reveal">
+          <span class="live-badge"><i></i><b id="syncStatus">正在连接</b></span>
+          <p>已有</p><strong id="reserveCount">—</strong><p>人为自己留下一席</p>
+          <small id="countNote">读取预订人气中…</small>
+        </div>
+        <div class="reserve-copy reveal"><div class="section-label light">05 / 即刻留席</div><h2>下一席，<br>等你入座。</h2><p>填写简单信息即可预订。每个浏览器只可留席一次，避免重复计数。</p><button class="btn btn-gold" data-open-reserve id="mainReserveButton">我要预订 <span>→</span></button></div>
+      </div>
+    </section>
+
+    <section class="reviews section-shell" id="reviews">
+      <div class="section-head reveal"><div><div class="section-label">06 / 食客说</div><h2>宴散之后，<br><em>余味还在。</em></h2></div><button class="btn btn-outline" id="openReview">写下你的感受</button></div>
+      <div class="review-stage reveal">
+        <button class="review-arrow" id="reviewPrev" aria-label="上一条评价">←</button>
+        <div class="review-track" id="reviewTrack"></div>
+        <button class="review-arrow" id="reviewNext" aria-label="下一条评价">→</button>
+      </div>
+      <div class="review-dots" id="reviewDots"></div>
+    </section>
+
+    <section class="newsletter">
+      <div class="section-shell newsletter-inner reveal"><div><small>FLOWING LETTERS</small><h2>接收下一场宴的消息</h2><p>新品、主题席与节气菜单，偶尔来信，不打扰。</p><p id="newsletterStatus" class="newsletter-status" hidden></p></div><form id="newsletterForm"><label><span>你的邮箱</span><input name="email" type="email" required autocomplete="email" placeholder="name@example.com"></label><button class="btn btn-primary" type="submit">订阅流水信</button></form></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-main section-shell"><div class="footer-brand"><div class="brand-seal">流</div><h2>流水宴</h2><p>流水有意，佳肴成席。</p></div><div><b>探索</b><a href="#story">品牌故事</a><a href="#menu">流水菜单</a><a href="#events">主题宴席</a></div><div><b>服务</b><a href="#planner">一键配桌</a><a href="#reserve">在线预订</a><a href="#reviews">食客评价</a></div><div><b>课堂旗舰店</b><span>语文课 · 小组主题宴席</span><span>展示时间以课堂安排为准</span><span>这是课堂创意项目</span></div></div>
+    <div class="footer-bottom section-shell"><span>© 2026 流水宴 · 小组创意项目</span><span>Made with 水意与人间烟火</span></div>
+  </footer>
+
+  <aside class="drawer" id="cartDrawer" aria-hidden="true" aria-label="菜篮">
+    <div class="drawer-head"><div><small>YOUR TABLE</small><h2>我的菜篮</h2></div><button class="close-button" data-close-drawer aria-label="关闭">×</button></div>
+    <div class="drawer-body" id="cartItems"></div>
+    <div class="drawer-empty" id="cartEmpty"><span>碗</span><b>菜篮还是空的</b><p>从菜单挑几道喜欢的菜吧。</p><a href="#menu" data-close-drawer>去选菜 →</a></div>
+    <div class="drawer-foot" id="cartFoot"><div class="cart-total"><span>合计 <small>（课堂菜单参考价）</small></span><strong>¥<span id="cartTotal">0</span></strong></div><div class="drawer-actions"><button class="text-button" id="clearCart">清空菜篮</button><button class="btn btn-primary" id="confirmOrder">确认菜单</button></div></div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <dialog class="modal dish-modal" id="dishModal"><button class="modal-close" data-close-modal aria-label="关闭">×</button><div id="dishModalContent"></div></dialog>
+  <dialog class="modal form-modal" id="reserveModal"><button class="modal-close" data-close-modal aria-label="关闭">×</button><form id="reserveForm"><div class="modal-kicker">RESERVATION</div><h2>为你留一席</h2><p>填好后，这台设备将不能重复预订。</p><div class="form-grid"><label>称呼<input name="nickname" maxlength="20" required placeholder="怎么称呼你？"></label><label>人数<select name="partySize" required><option value="2">2 位</option><option value="4">4 位</option><option value="6" selected>6 位</option><option value="8">8 位</option><option value="10">10 位</option><option value="12">12 位</option></select></label><label>日期<input type="date" name="visitDate" required></label><label>时间<select name="visitTime" required><option>11:30</option><option>12:30</option><option>17:30</option><option>18:30</option><option>19:30</option></select></label></div><fieldset><legend>喜欢的座位</legend><label><input type="radio" name="seating" value="临水席" checked><span>临水席</span></label><label><input type="radio" name="seating" value="窗边席"><span>窗边席</span></label><label><input type="radio" name="seating" value="热闹大桌"><span>热闹大桌</span></label></fieldset><button class="btn btn-primary full" type="submit">确认预订</button><small class="privacy-note">仅用于本次课堂网站演示，不需要填写真实电话。</small></form><div class="success-panel" id="reserveSuccess" hidden><div class="success-mark">✓</div><h2>已为你留席</h2><p id="successText">开宴见！</p><button class="btn btn-primary" data-close-modal>好的</button></div></dialog>
+  <dialog class="modal form-modal" id="reviewModal"><button class="modal-close" data-close-modal aria-label="关闭">×</button><form id="reviewForm"><div class="modal-kicker">YOUR WORDS</div><h2>写下你的感受</h2><label>名字<input name="name" maxlength="12" required placeholder="你的名字"></label><label>评分<select name="rating"><option value="5">★★★★★ 很喜欢</option><option value="4">★★★★ 很不错</option><option value="3">★★★ 还可以</option></select></label><label>评价<textarea name="text" maxlength="100" required placeholder="哪道菜让你记住了流水宴？"></textarea></label><button class="btn btn-primary full">发布评价</button></form></dialog>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <button class="back-to-top" id="backToTop" aria-label="返回顶部">↑</button>
+</body>
+</html>

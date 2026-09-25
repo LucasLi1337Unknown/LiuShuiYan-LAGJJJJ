@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#062f3d">
+  <title>流水宴 · 订阅台</title>
+  <style>
+    :root{--deep:#062f3d;--water:#0d6c86;--cyan:#79c9d5;--paper:#f7f1e3;--red:#9f2638;--gold:#d6a44b;--ink:#102a33;--line:rgba(16,42,51,.14)}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;min-height:100vh}button{font:inherit}.topbar{height:74px;background:var(--deep);color:white;display:flex;align-items:center;justify-content:space-between;padding:0 max(20px,calc((100vw - 1100px)/2))}.brand{display:flex;align-items:center;gap:12px}.seal{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--red);color:#ffe7a7;font-family:serif;font-size:21px}.brand b{font-family:"Songti SC",serif;font-size:20px;letter-spacing:.14em}.brand small{display:block;opacity:.5;font-size:8px;letter-spacing:.24em}.topbar>span{font-size:12px;color:rgba(255,255,255,.56)}main{width:min(1100px,calc(100% - 32px));margin:52px auto}.intro{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:32px}.eyebrow{color:var(--water);font-size:11px;font-weight:800;letter-spacing:.2em}.intro h1{font-family:"Songti SC",serif;font-size:48px;font-weight:500;margin:10px 0}.intro p{color:#6d7979;margin:0;line-height:1.8}.actions{display:flex;gap:9px}.btn{border:1px solid var(--line);background:white;padding:11px 16px;cursor:pointer;font-weight:700}.btn.primary{background:var(--red);border-color:var(--red);color:white}.summary{display:grid;grid-template-columns:1fr 1fr 2fr;gap:14px;margin-bottom:16px}.card{background:#fffaf0;border:1px solid var(--line);padding:24px}.stat strong{font-family:"Songti SC",serif;font-size:42px;color:var(--red)}.stat span{display:block;color:#6d7979;font-size:12px;margin-top:4px}.mode{display:flex;align-items:center;gap:13px}.mode i{width:11px;height:11px;border-radius:50%;background:#e4a83c;box-shadow:0 0 0 7px rgba(228,168,60,.13)}.mode.cloud i{background:#49b780;box-shadow:0 0 0 7px rgba(73,183,128,.13)}.mode b{display:block}.mode small{color:#6d7979}.table-card{background:#fffaf0;border:1px solid var(--line)}.table-head{padding:21px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.table-head h2{font-family:"Songti SC",serif;margin:0}.table-head span{font-size:12px;color:#6d7979}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;padding:16px 24px;border-bottom:1px solid var(--line)}th{font-size:11px;color:#6d7979;letter-spacing:.1em}td{font-size:14px}td:first-child{color:#9f2638;font-family:serif}.empty{text-align:center;padding:70px 20px;color:#6d7979}.empty b{display:block;color:var(--ink);font-family:"Songti SC",serif;font-size:24px;margin-bottom:9px}.notice{margin-top:18px;padding:15px 18px;background:rgba(13,108,134,.08);border-left:3px solid var(--water);font-size:12px;line-height:1.7;color:#4e6668}.toast{position:fixed;right:20px;bottom:20px;background:var(--deep);color:white;padding:13px 18px;box-shadow:0 12px 35px rgba(0,0,0,.2);opacity:0;transform:translateY(10px);transition:.25s}.toast.show{opacity:1;transform:none}@media(max-width:720px){.topbar>span{display:none}main{margin-top:32px}.intro{display:block}.intro h1{font-size:38px}.actions{margin-top:22px}.summary{grid-template-columns:1fr 1fr}.summary .card:last-child{grid-column:1/-1}.card{padding:18px}}
+  </style>
+  <script src="config.js"></script>
+</head>
+<body>
+  <header class="topbar"><div class="brand"><span class="seal">流</span><span><b>流水宴</b><small>SUBSCRIBER CONSOLE</small></span></div><span>不在官网导航中显示 · 知道链接的人可访问</span></header>
+  <main>
+    <section class="intro"><div><div class="eyebrow">FLOWING LETTERS / 管理页面</div><h1>流水信订阅台</h1><p>查看访客在官网留下的订阅邮箱，并导出为 CSV 名单。</p></div><div class="actions"><button class="btn" id="refresh">刷新名单</button><button class="btn primary" id="export">导出 CSV</button></div></section>
+    <section class="summary"><div class="card stat"><strong id="total">—</strong><span>订阅邮箱总数</span></div><div class="card stat"><strong id="today">—</strong><span>今天新增</span></div><div class="card mode" id="mode"><i></i><div><b id="modeTitle">正在读取</b><small id="modeText">请稍候…</small></div></div></section>
+    <section class="table-card"><div class="table-head"><h2>订阅名单</h2><span id="updated">尚未刷新</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>邮箱地址</th><th>订阅时间</th><th>来源</th></tr></thead><tbody id="rows"></tbody></table><div class="empty" id="empty" hidden><b>暂时没有订阅</b><span>有人在官网提交邮箱后，这里就会出现。</span></div></div></section>
+    <p class="notice">这是你选择的“隐藏链接版”。本页面已经要求搜索引擎不要收录，也不会出现在流水宴官网导航中；但任何拿到链接的人仍然可以打开。课堂项目够用，请不要拿它保存特别敏感的信息。</p>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script>
+    "use strict";
+    const $=s=>document.querySelector(s);let subscribers=[];
+    function config(){const c=window.LSY_CONFIG||{};return c.SUPABASE_URL&&c.SUPABASE_ANON_KEY?c:null}
+    function showToast(text){const el=$("#toast");el.textContent=text;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2200)}
+    function localList(){try{return JSON.parse(localStorage.getItem("lsy_newsletter_local_v1"))||[]}catch{return []}}
+    function formatDate(value){if(!value)return "—";return new Intl.DateTimeFormat("zh-CN",{dateStyle:"medium",timeStyle:"short"}).format(new Date(value))}
+    function render(list,cloud){subscribers=list;$("#total").textContent=list.length;const today=new Date().toDateString();$("#today").textContent=list.filter(x=>new Date(x.created_at).toDateString()===today).length;$("#rows").innerHTML=list.map((x,i)=>`<tr><td>${String(i+1).padStart(2,"0")}</td><td>${escapeHTML(x.email)}</td><td>${formatDate(x.created_at)}</td><td>${cloud?"官网云端":"当前浏览器"}</td></tr>`).join("");$("#empty").hidden=list.length>0;$("#updated").textContent=`更新于 ${new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"})}`;$("#mode").classList.toggle("cloud",cloud);$("#modeTitle").textContent=cloud?"云端名单":"本机演示名单";$("#modeText").textContent=cloud?"显示所有设备提交的邮箱":"配置 Supabase 后即可跨设备查看"}
+    function escapeHTML(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+    function cloudHeaders(c){const headers={apikey:c.SUPABASE_ANON_KEY};if(!c.SUPABASE_ANON_KEY.startsWith("sb_publishable_"))headers.Authorization=`Bearer ${c.SUPABASE_ANON_KEY}`;return headers}
+    async function load(){const c=config();if(!c){render(localList(),false);return}try{const res=await fetch(`${c.SUPABASE_URL}/rest/v1/newsletter_subscribers?select=email,created_at&order=created_at.desc`,{headers:cloudHeaders(c)});if(!res.ok)throw new Error();render(await res.json(),true)}catch{render(localList(),false);showToast("云端读取失败，正在显示本机名单")}}
+    function csvCell(value){let text=String(value??"");if(/^[=+@-]/.test(text))text="'"+text;return `"${text.replaceAll('"','""')}"`}
+    function exportCSV(){if(!subscribers.length){showToast("还没有可以导出的订阅");return}const lines=[["邮箱","订阅时间"],...subscribers.map(x=>[x.email,x.created_at])].map(row=>row.map(csvCell).join(","));const blob=new Blob(["\ufeff"+lines.join("\n")],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`流水宴订阅名单-${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(a.href);showToast("CSV 已导出")}
+    $("#refresh").onclick=()=>{load();showToast("正在刷新名单")};$("#export").onclick=exportCSV;load();
+  </script>
+</body>
+</html>
