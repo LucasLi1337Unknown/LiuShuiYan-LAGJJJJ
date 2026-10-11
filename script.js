@@ -47,7 +47,7 @@ const $ = (s, root=document) => root.querySelector(s);
 const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const state = {
   category:"全部", search:"", favoritesOnly:false,
-  cart:readJSON(STORE.cart,{}), favorites:new Set(readJSON(STORE.favorites,[])),
+  cart:normalizeCart(readJSON(STORE.cart,{})), favorites:new Set(readJSON(STORE.favorites,[])),
   people:6, reviewIndex:0, cloudReviews:[], cloudReviewsLoaded:false
 };
 
@@ -59,7 +59,7 @@ function artMarkup(d,small=false){return `<div class="dish-art${small?" cart-thu
 function toast(message){const el=document.createElement("div");el.className="toast";el.textContent=message;$("#toastStack").append(el);setTimeout(()=>el.classList.add("hide"),2600);setTimeout(()=>el.remove(),3000)}
 
 function init(){
-  applySavedTheme(); renderTabs(); renderDishes(); renderCart(); renderReviews(); setupUI(); setupReveal(); setupReservation(); setupReviews(); renderHeroArt();
+  saveCart(); applySavedTheme(); renderTabs(); renderDishes(); renderCart(); renderReviews(); setupUI(); setupReveal(); setupReservation(); setupReviews(); renderHeroArt();
   const date=$("input[name='visitDate']"); if(date){const today=new Date();date.min=today.toISOString().slice(0,10);const next=new Date(today);next.setDate(today.getDate()+1);date.value=next.toISOString().slice(0,10)}
 }
 
@@ -77,13 +77,15 @@ function renderDishes(){
 function toggleFavorite(id){state.favorites.has(id)?state.favorites.delete(id):state.favorites.add(id);writeJSON(STORE.favorites,[...state.favorites]);renderDishes();toast(state.favorites.has(id)?"已收藏这道菜":"已取消收藏")}
 function openDish(id){const d=dishById(id);if(!d)return;$("#dishModalContent").innerHTML=`<div class="dish-modal-layout"><div class="dish-modal-art">${artMarkup(d)}</div><div class="dish-modal-copy"><span class="category">${d.cat.toUpperCase()} · LIU SHUI YAN</span><h2>${d.name}</h2><span class="price">¥${d.price}</span><p>${d.desc}</p><div class="modal-tags">${d.tags.map(t=>`<span>${t}</span>`).join("")}<span>适合分享</span></div><button class="btn btn-primary" data-modal-add="${d.id}">加入菜篮 <span>＋</span></button></div></div>`;$("#dishModal").showModal()}
 
-function addCart(id,qty=1){state.cart[id]=(state.cart[id]||0)+qty;saveCart();renderCart();toast(`${dishById(id).name} 已加入菜篮`)}
-function changeCart(id,delta){state.cart[id]=(state.cart[id]||0)+delta;if(state.cart[id]<=0)delete state.cart[id];saveCart();renderCart()}
-function saveCart(){writeJSON(STORE.cart,state.cart)}
+function normalizeCart(cart){const result={};if(!cart||typeof cart!=="object"||Array.isArray(cart))return result;Object.entries(cart).forEach(([id,value])=>{const qty=Math.min(10,Math.max(0,Math.floor(Number(value))||0));if(dishById(id)&&qty>0)result[id]=qty});return result}
+function addCart(id,qty=1){const dish=dishById(id);if(!dish)return;const current=state.cart[id]||0;if(current>=10){toast("每种菜最多点 10 份");return}state.cart[id]=Math.min(10,current+Math.max(1,Math.floor(Number(qty))||1));saveCart();renderCart();toast(`${dish.name} 已加入菜篮`)}
+
+function changeCart(id,delta){if(!dishById(id))return;const current=state.cart[id]||0;if(delta>0&&current>=10){toast("每种菜最多点 10 份");return}state.cart[id]=Math.min(10,current+delta);if(state.cart[id]<=0)delete state.cart[id];saveCart();renderCart()}
+function saveCart(){state.cart=normalizeCart(state.cart);writeJSON(STORE.cart,state.cart)}
 function cartEntries(){return Object.entries(state.cart).filter(([id,q])=>dishById(id)&&q>0)}
 function renderCart(){
   const entries=cartEntries();const count=entries.reduce((s,[,q])=>s+q,0);$("#cartCount").textContent=count;
-  $("#cartItems").innerHTML=entries.map(([id,q])=>{const d=dishById(id);return `<div class="cart-item">${artMarkup(d,true)}<div><h4>${d.name}</h4><small>¥${d.price*q}</small><div class="qty"><button data-qty="${id}" data-delta="-1" aria-label="减少">−</button><span>${q}</span><button data-qty="${id}" data-delta="1" aria-label="增加">＋</button></div></div><button class="remove-item" data-remove="${id}" aria-label="删除${d.name}">×</button></div>`}).join("");
+  $("#cartItems").innerHTML=entries.map(([id,q])=>{const d=dishById(id);return `<div class="cart-item">${artMarkup(d,true)}<div><h4>${d.name}</h4><small>¥${d.price*q}</small><div class="qty"><button data-qty="${id}" data-delta="-1" aria-label="减少">−</button><span>${q}</span><button data-qty="${id}" data-delta="1" aria-label="${q>=10?"已达上限：10份":"增加"}" ${q>=10?"disabled":""}>＋</button></div></div><button class="remove-item" data-remove="${id}" aria-label="删除${d.name}">×</button></div>`}).join("");
   $("#cartTotal").textContent=entries.reduce((s,[id,q])=>s+dishById(id).price*q,0);$("#cartEmpty").hidden=entries.length>0;$("#cartFoot").hidden=entries.length===0;$("#cartItems").hidden=entries.length===0;
 }
 function openCart(){$("#cartDrawer").classList.add("open");$("#cartDrawer").setAttribute("aria-hidden","false");$("#backdrop").classList.add("open");document.body.classList.add("no-scroll")}
