@@ -92,6 +92,7 @@ function openCart(){$("#cartDrawer").classList.add("open");$("#cartDrawer").setA
 function closeCart(){$("#cartDrawer").classList.remove("open");$("#cartDrawer").setAttribute("aria-hidden","true");$("#backdrop").classList.remove("open");document.body.classList.remove("no-scroll")}
 
 function planTable(people=state.people){
+  if(cartEntries().length&&!confirm("重新配桌会替换菜篮里的所有菜，确定继续吗？"))return;
   state.people=Math.max(2,Math.min(16,people));$("#peopleCount").textContent=state.people;
   const wanted=state.people<=4?6:state.people<=8?8:10;const groups={"荤菜":2,"素菜":2,"汤":1,"凉菜":1,"甜品":1,"饮品":1};if(wanted===10){groups["荤菜"]=3;groups["素菜"]=3}
   const selection=[];Object.entries(groups).forEach(([cat,count])=>{const pool=DISHES.filter(d=>d.cat===cat).sort(()=>Math.random()-.5);selection.push(...pool.slice(0,count))});
@@ -132,7 +133,7 @@ function setupUI(){
   $("#favoritesOnly").onclick=()=>{state.favoritesOnly=!state.favoritesOnly;$("#favoritesOnly").classList.toggle("active",state.favoritesOnly);renderDishes()};
   $("#openCart").onclick=openCart;$("#backdrop").onclick=closeCart;
   $("#clearCart").onclick=()=>{if(confirm("确定清空菜篮吗？")){state.cart={};saveCart();renderCart()}};
-  $("#confirmOrder").onclick=()=>{const num=`LSY-${String(Date.now()).slice(-6)}`;closeCart();toast(`菜单已确认 · 编号 ${num}`);setTimeout(()=>$("#reserveModal").showModal(),500)};
+  $("#confirmOrder").onclick=showMenuCard;
   $("#peopleMinus").onclick=()=>{state.people=Math.max(2,state.people-1);$("#peopleCount").textContent=state.people};
   $("#peoplePlus").onclick=()=>{state.people=Math.min(16,state.people+1);$("#peopleCount").textContent=state.people};$("#autoPlan").onclick=()=>planTable();
   $("#reviewPrev").onclick=()=>moveReview(-1);$("#reviewNext").onclick=()=>moveReview(1);$("#openReview").onclick=()=>$("#reviewModal").showModal();
@@ -194,3 +195,23 @@ $("#reserveForm")?.addEventListener("submit",async e=>{
 });
 
 document.addEventListener("DOMContentLoaded",init);
+
+function showMenuCard(){
+  const entries=cartEntries();if(!entries.length){toast("先选几道菜吧");return;}
+  const total=entries.reduce((sum,[id,q])=>sum+dishById(id).price*q,0);
+  const number="LSY-"+Date.now().toString(36).toUpperCase();
+  const lines=entries.map(([id,q])=>dishById(id).name+" × "+q+"　¥"+dishById(id).price*q);
+  const text=["流水宴 · 我的菜单","编号："+number,...lines,"合计：¥"+total,"课堂创意菜单，非真实订单"].join("\n");
+  $("#menuCardContent").innerHTML='<div class="modal-kicker">YOUR MENU</div><h2>这一席，选好了</h2><p>编号：'+number+'</p><div class="saved-menu-lines">'+entries.map(([id,q])=>'<p><span>'+esc(dishById(id).name)+' × '+q+'</span><strong>¥'+dishById(id).price*q+'</strong></p>').join("")+'</div><h3>合计：¥'+total+'</h3><p>课堂创意菜单，非真实订单</p>';
+  $("#copyMenu").onclick=async()=>{
+    try{await navigator.clipboard.writeText(text);toast("菜单已复制");}
+    catch(err){$("#menuCopyFallback").value=text;$("#menuCopyFallback").hidden=false;$("#menuCopyFallback").select();toast("请复制下方菜单文字");}
+  };
+  $("#downloadMenu").onclick=()=>{
+    const url=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));
+    const link=document.createElement("a");link.href=url;link.download="流水宴菜单-"+number+".txt";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  $("#menuCopyFallback").hidden=true;
+  $("#menuCardReserve").onclick=()=>{$("#menuCardModal").close();openReserve();};
+  closeCart();$("#menuCardModal").showModal();
+}
