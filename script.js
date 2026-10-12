@@ -149,7 +149,17 @@ function onScroll(){const y=scrollY;$(".site-header").classList.toggle("scrolled
 function setupReveal(){const io=new IntersectionObserver(entries=>entries.forEach(x=>{if(x.isIntersecting){x.target.classList.add("visible");io.unobserve(x.target)}}),{threshold:.12});$$('.reveal').forEach(x=>io.observe(x))}
 function applySavedTheme(){if(localStorage.getItem(STORE.theme)==="night"){document.body.classList.add("night");$("#themeToggle").textContent="☀"}}
 function toggleTheme(){document.body.classList.toggle("night");const night=document.body.classList.contains("night");localStorage.setItem(STORE.theme,night?"night":"day");$("#themeToggle").textContent=night?"☀":"☾";toast(night?"夜宴模式已开启":"日间模式已开启")}
-function playStory(){if(!("speechSynthesis" in window)){toast("这个浏览器暂不支持语音讲述");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance("流水宴，取流水不息、宾朋相聚之意。水把远方带来，宴让彼此坐近。流水有意，佳肴成席。");u.lang="zh-CN";u.rate=.9;speechSynthesis.speak(u);toast("正在讲述流水宴的故事")}
+let storyAudio;
+function playStory(){
+  const button=$("#playStory");
+  if(!storyAudio){
+    storyAudio=new Audio(window.liushuiStoryAudioSource);
+    storyAudio.onended=()=>{button.innerHTML='听一段流水宴的故事 <span>▶</span>';};
+    storyAudio.onerror=()=>{button.innerHTML='听一段流水宴的故事 <span>▶</span>';toast("音频加载失败，请刷新后重试");};
+  }
+  if(!storyAudio.paused){storyAudio.pause();button.innerHTML='继续聆听 <span>▶</span>';return;}
+  storyAudio.play().then(()=>{button.innerHTML='暂停聆听 <span>Ⅱ</span>';}).catch(()=>toast("播放失败，请再点击一次重试"));
+}
 
 function getDeviceId(){let id=localStorage.getItem(STORE.device);if(!id){id=crypto.randomUUID?crypto.randomUUID():`lsy-${Date.now()}-${Math.random().toString(16).slice(2)}`;localStorage.setItem(STORE.device,id)}return id}
 function cloudConfig(){const c=window.LSY_CONFIG||{};return c.SUPABASE_URL&&c.SUPABASE_ANON_KEY?c:null}
