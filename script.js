@@ -201,14 +201,14 @@ function showMenuCard(){
   const total=entries.reduce((sum,[id,q])=>sum+dishById(id).price*q,0);
   const number="LSY-"+Date.now().toString(36).toUpperCase();
   const lines=entries.map(([id,q])=>dishById(id).name+" × "+q+"　¥"+dishById(id).price*q);
-  const text=["流水宴 · 我的菜单","编号："+number,...lines,"合计：¥"+total,"课堂创意菜单，非真实订单"].join("\n");
+  const menuText=()=>[$("#banquetName")?.value.trim()||"流水宴 · 我的菜单","编号："+number,...lines,"合计：¥"+total,"课堂创意菜单，非真实订单"].join("\n");
   $("#menuCardContent").innerHTML='<div class="modal-kicker">YOUR MENU</div><h2>这一席，选好了</h2><p>编号：'+number+'</p><div class="saved-menu-lines">'+entries.map(([id,q])=>'<p><span>'+esc(dishById(id).name)+' × '+q+'</span><strong>¥'+dishById(id).price*q+'</strong></p>').join("")+'</div><h3>合计：¥'+total+'</h3><p>课堂创意菜单，非真实订单</p>';
   $("#copyMenu").onclick=async()=>{
-    try{await navigator.clipboard.writeText(text);toast("菜单已复制");}
-    catch(err){$("#menuCopyFallback").value=text;$("#menuCopyFallback").hidden=false;$("#menuCopyFallback").select();toast("请复制下方菜单文字");}
+    try{await navigator.clipboard.writeText(menuText());toast("菜单已复制");}
+    catch(err){$("#menuCopyFallback").value=menuText();$("#menuCopyFallback").hidden=false;$("#menuCopyFallback").select();toast("请复制下方菜单文字");}
   };
   $("#downloadMenu").onclick=()=>{
-    const url=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));
+    const url=URL.createObjectURL(new Blob([menuText()],{type:"text/plain;charset=utf-8"}));
     const link=document.createElement("a");link.href=url;link.download="流水宴菜单-"+number+".txt";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   };
   $("#menuCopyFallback").hidden=true;
