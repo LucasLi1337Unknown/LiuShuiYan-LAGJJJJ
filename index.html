@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="styles.css?v=20261011-cart10-2">
   <script src="config.js"></script>
   <script src="assets/story-audio.js?v=20261012" defer></script>
-  <script src="script.js?v=20261012-interactive" defer></script>
+  <script src="script.js?v=20261016-review-ip" defer></script>
   <script src="interactions.js?v=20261012-1" defer></script>
   <link rel="stylesheet" href="interactions.css?v=20261012-1">
   <style>[hidden]{display:none!important}.qty button:disabled{opacity:.35;cursor:not-allowed}</style>
@@ -154,7 +154,7 @@
         <div class="review-track" id="reviewTrack"></div>
         <button class="review-arrow" id="reviewNext" aria-label="下一条评价">→</button>
       </div>
-      <div class="review-dots" id="reviewDots"></div>
+      <div class="review-dots" id="reviewDots"></div><p class="privacy-note">IP 仅显示部分地址，供参考；同一网络可能多人共用，切换网络或 VPN 也会改变 IP，不能据此确认评价来自不同的人。旧评价未记录 IP。</p>
     </section>
 
     <section class="newsletter">
@@ -177,7 +177,7 @@
 
   <dialog class="modal dish-modal" id="dishModal"><button class="modal-close" data-close-modal aria-label="关闭">×</button><div id="dishModalContent"></div></dialog>
   <dialog class="modal form-modal" id="reserveModal"><button class="modal-close" data-close-modal aria-label="关闭">×</button><form id="reserveForm"><div class="modal-kicker">RESERVATION</div><h2>为你留一席</h2><p>填好后，这台设备将不能重复预订。</p><div class="form-grid"><label>称呼<input name="nickname" maxlength="20" required placeholder="怎么称呼你？"></label><label>人数<select name="partySize" required><option value="2">2 位</option><option value="4">4 位</option><option value="6" selected>6 位</option><option value="8">8 位</option><option value="10">10 位</option><option value="12">12 位</option></select></label><label>日期<input type="date" name="visitDate" required></label><label>时间<select name="visitTime" required><option>11:30</option><option>12:30</option><option>17:30</option><option>18:30</option><option>19:30</option></select></label></div><fieldset><legend>喜欢的座位</legend><label><input type="radio" name="seating" value="临水席" checked><span>临水席</span></label><label><input type="radio" name="seating" value="窗边席"><span>窗边席</span></label><label><input type="radio" name="seating" value="热闹大桌"><span>热闹大桌</span></label></fieldset><button class="btn btn-primary full" type="submit">确认预订</button><small class="privacy-note">仅用于本次课堂网站演示，不需要填写真实电话。</small></form><div class="success-panel" id="reserveSuccess" hidden><div class="success-mark">✓</div><h2>已为你留席</h2><p id="successText">开宴见！</p><button class="btn btn-primary" data-close-modal>好的</button></div></dialog>
-  <dialog class="modal form-modal" id="reviewModal"><button class="modal-close" data-close-modal aria-label="关闭">×</button><form id="reviewForm"><div class="modal-kicker">YOUR WORDS</div><h2>写下你的感受</h2><label>名字<input name="name" maxlength="12" required placeholder="你的名字"></label><label>评分<select name="rating"><option value="5">★★★★★ 很喜欢</option><option value="4">★★★★ 很不错</option><option value="3">★★★ 还可以</option></select></label><label>评价<textarea name="text" maxlength="100" required placeholder="哪道菜让你记住了流水宴？"></textarea></label><button class="btn btn-primary full">发布评价</button></form></dialog>
+  <dialog class="modal form-modal" id="reviewModal"><button class="modal-close" data-close-modal aria-label="关闭">×</button><form id="reviewForm"><div class="modal-kicker">YOUR WORDS</div><h2>写下你的感受</h2><label>名字<input name="name" maxlength="12" required placeholder="你的名字"></label><label>评分<select name="rating"><option value="5">★★★★★ 很喜欢</option><option value="4">★★★★ 很不错</option><option value="3">★★★ 还可以</option></select></label><label>评价<textarea name="text" maxlength="100" required placeholder="哪道菜让你记住了流水宴？"></textarea></label><p class="privacy-note">发布后会公开显示你的脱敏 IP（例如 123.45.*.*），仅保存部分地址，不保存完整 IP。网络地址不能证明个人身份。</p><button class="btn btn-primary full">发布评价</button></form></dialog>
 
   <dialog class="modal form-modal" id="menuCardModal"><button class="modal-close" data-close-modal aria-label="关闭">×</button><div id="menuCardContent"></div><textarea id="menuCopyFallback" readonly hidden aria-label="复制菜单文字"></textarea><div class="menu-card-actions"><button class="btn btn-primary" id="copyMenu">复制菜单</button><button class="btn btn-outline" id="downloadMenu">下载菜单</button><button class="text-button" id="menuCardReserve">继续留席 →</button></div></dialog>
   <style>.saved-menu-lines p{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid #8883;padding:8px 0}.menu-card-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}#menuCopyFallback{width:100%;min-height:180px}#menuCardModal{max-height:85vh;overflow:auto}</style>
