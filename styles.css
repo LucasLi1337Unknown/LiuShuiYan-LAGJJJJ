@@ -51,3 +51,11 @@ body.night{--ink:#e9f4f3;--deep:#031f2b;--paper:#092d38;--paper-2:#06232d;--mute
 .ink-two{background-image:linear-gradient(180deg,rgba(65,16,23,.08),rgba(65,16,23,.88)),url("assets/images/signature-feast.png");background-size:cover;background-position:center}
 .ink-three{background-image:linear-gradient(180deg,rgba(3,45,48,.06),rgba(3,45,48,.88)),url("assets/images/soups-sweets.png");background-size:cover;background-position:center}
 .empty-state[hidden]{display:none!important}
+
+.review-location-help{margin:12px auto 0;max-width:640px;color:var(--muted);font-size:12px}
+.review-location-help summary{display:flex;align-items:center;justify-content:center;gap:6px;width:fit-content;min-height:44px;margin:auto;padding:4px 8px;cursor:pointer;list-style:none;border-radius:8px}
+.review-location-help summary::-webkit-details-marker{display:none}
+.review-help-icon{display:inline-grid;place-items:center;width:22px;height:22px;border:1px solid var(--muted);border-radius:50%;font-weight:700;font-size:13px;line-height:1}
+.review-location-help summary:hover,.review-location-help[open] summary{color:var(--water)}
+.review-location-help summary:focus-visible{outline:2px solid var(--water);outline-offset:3px}
+.review-location-help .privacy-note{margin:6px 0 0;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:var(--paper);text-align:left;line-height:1.8;overflow-wrap:anywhere}
